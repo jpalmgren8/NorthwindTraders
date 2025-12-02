@@ -4,9 +4,12 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class App {
-    public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
+
+    private static Connection connection = null;
+
+    public static void main(String[] args) {
 
         boolean menuSelect = true;
 
@@ -15,6 +18,7 @@ public class App {
             System.out.println("What do you want to do?");
         System.out.println("1) Display all products");
         System.out.println("2) Display all customers");
+        System.out.println("3) Display all categories");
         System.out.println("0) Exit");
         System.out.println("Select an option: ");
 
@@ -29,6 +33,9 @@ public class App {
             case 2:
                 customerQueries();
                 break;
+            case 3:
+                categoryQueries();
+                break;
             case 0:
                 menuSelect = false;
                 System.out.println("Goodbye!");
@@ -39,21 +46,17 @@ public class App {
 
     public static void customerQueries() {
 
-        ResultSet resultSet = null;
-        PreparedStatement preparedStatement = null;
-        Connection connection = null;
-
-        String query = "SELECT * FROM Customers ORDER BY Country";
-
         try {
-
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind",
                     "root",
                     "yearup");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-            preparedStatement = connection.prepareStatement(query);
+        String query = "SELECT * FROM Customers ORDER BY Country";
 
-            resultSet = preparedStatement.executeQuery();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery();) {
 
             while (resultSet.next()) {
                 System.out.println("Contact Name: " + resultSet.getString("ContactName"));
@@ -65,50 +68,22 @@ public class App {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     public static void productQueries() {
 
-        ResultSet resultSet = null;
-        PreparedStatement preparedStatement = null;
-        Connection connection = null;
-
-        String query = "SELECT * FROM Products";
-
         try {
-
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind",
                     "root",
                     "yearup");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-            preparedStatement = connection.prepareStatement(query);
+        String query = "SELECT * FROM Products";
 
-            resultSet = preparedStatement.executeQuery();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery();) {
 
             while (resultSet.next()) {
                 System.out.println("Product ID: " + resultSet.getInt("ProductID"));
@@ -119,30 +94,31 @@ public class App {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
+
+    public static void categoryQueries() {
+
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind",
+                    "root",
+                    "yearup");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String query = "SELECT * FROM Categories";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery();) {
+
+            while (resultSet.next()) {
+                System.out.println("Category ID: " + resultSet.getInt("CategoryID"));
+                System.out.println("Name: " + resultSet.getString("CategoryName"));
+                System.out.println("------------------");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
